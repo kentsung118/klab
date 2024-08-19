@@ -77,8 +77,9 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
                 body?.let { responseBody ->
                     Log.d("lala", "doWork flag4")
+                    val contentLength = responseBody.contentLength()
 
-                    saveFileToGallery(appContext, responseBody.byteStream(), fileName)
+                    saveFileToGallery(appContext, responseBody.byteStream(), fileName, contentLength)
                     Log.d("lala", "doWork flag5")
 
                 }
@@ -92,7 +93,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             }
         }
 
-        private fun saveFileToGallery(context: Context, inputStream: InputStream, fileName: String) {
+        private fun saveFileToGallery(context: Context, inputStream: InputStream, fileName: String, contentLength:Long) {
             val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
             val appDir = File(picturesDir, "MyAppImages")
 
@@ -102,12 +103,19 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
             val file = File(appDir, fileName)
             var outputStream: FileOutputStream? = null
+            var totalBytesRead: Long = 0
+
+
 
             try {
                 outputStream = FileOutputStream(file)
-                val buffer = ByteArray(1024)
+                val buffer = ByteArray(8192*10)
                 var length: Int
                 while (inputStream.read(buffer).also { length = it } != -1) {
+                    totalBytesRead += length
+                    val progress = (100 * totalBytesRead / contentLength).toInt()
+                    Log.d("lala", "progress=$progress")
+
                     outputStream.write(buffer, 0, length)
                 }
                 outputStream.flush()
