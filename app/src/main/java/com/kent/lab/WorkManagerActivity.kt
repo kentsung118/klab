@@ -32,6 +32,23 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding.btn2.setOnClickListener {
+            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            ///storage/emulated/0/DCIM/75143711_kent.mp4
+
+            val filePath = "$picturesDir/75143711_kent.mp4"
+            val file = File(filePath)
+            Log.d("lala", "file path=${file.absolutePath}")
+            Log.d("lala", "file exists=${file.exists()}")
+            Log.d("lala", "file sizw=${file.length()}")
+        }
+
+        binding.btn3.setOnClickListener {
+            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            val filePath = "$picturesDir/75143711_kent.mp4"
+            val file = File(filePath)
+            file.delete()
+        }
 
         binding.btn1.setOnClickListener {
             Log.d("lala", "work request flag1")
@@ -47,13 +64,14 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             workManager.enqueue(downloadRequest)
 //            workManager.getWorkInfosByTag(workTag).
 
+            //從 Main thread 監聽 進度
             workManager.getWorkInfoByIdLiveData(downloadRequest.id).observe(this, object : Observer<WorkInfo?> {
                 //获取WorkInfo对象，实时监测任务的状态
                 override fun onChanged(workInfo: WorkInfo?) {
                     workInfo?.let {
                         when (it.state) {
                             WorkInfo.State.RUNNING -> {
-                                Log.e("调试_临时_log", "当前进度 = " + it.progress.getInt("Progress", -1));
+                                Log.d("lala", "当前进度 = " + it.progress.getInt("Progress", -1));
                             }
                             WorkInfo.State.SUCCEEDED -> {
                                 Log.d("lala", "workInfo success value=$workInfo")
@@ -62,15 +80,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                         }
                     }
                 }
-                //                fun onChanged(workInfo: WorkInfo?) {
-//                    if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-//                        val value = workInfo.outputData.getString("key") //获取Worker返回的数据
-//                    }
-//                }
             })
-
-
-
             Log.d("lala", "work request flag2")
 
         }
@@ -81,43 +91,28 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
         override suspend fun doWork(): Result {
             Log.d("lala", "doWork flag1")
-
             val url = inputData.getString("DOWNLOAD_URL") ?: return Result.failure()
             Log.d("lala", "doWork flag2")
-
-
             try {
                 val client = OkHttpClient()
                 val request = Request.Builder().url(url).build()
                 val response = client.newCall(request).execute()
-
                 Log.d("lala", "doWork flag3")
-
                 if (!response.isSuccessful) return Result.failure()
                 Log.d("lala", "doWork flag4")
-
                 val fileName = "${SystemClock.uptimeMillis()}_kent.mp4"
                 Log.d("lala", "file name =$fileName")
-
-//                val file = File("$picturesDir/${fileName}_kent.mp4")
-
-
                 // Save file to disk, update progress, etc.
                 // ...
                 val body: ResponseBody? = response.body
                 Log.d("lala", "doWork flag5")
-
                 body?.let { responseBody ->
                     Log.d("lala", "doWork flag4")
                     val contentLength = responseBody.contentLength()
-
                     saveFileToGallery(appContext, responseBody.byteStream(), fileName, contentLength)
                     Log.d("lala", "doWork flag5")
-
                 }
-
                 Log.d("lala", "doWork flag flag6")
-
                 return Result.success()
             } catch (e: Exception) {
                 Log.d("lala", "doWork flag exception, $e")
@@ -127,13 +122,8 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
         private fun saveFileToGallery(context: Context, inputStream: InputStream, fileName: String, contentLength: Long) {
             val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-            val appDir = File(picturesDir, "MyAppImages")
 
-            if (!appDir.exists()) {
-                appDir.mkdirs()
-            }
-
-            val file = File(appDir, fileName)
+            val file = File(picturesDir, fileName)
             var outputStream: FileOutputStream? = null
             var totalBytesRead: Long = 0
 
@@ -141,7 +131,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
             try {
                 outputStream = FileOutputStream(file)
-                val buffer = ByteArray(8192*5 )
+                val buffer = ByteArray(8192 )
                 var length: Int
                 while (inputStream.read(buffer).also { length = it } != -1) {
                     totalBytesRead += length
@@ -151,7 +141,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                         val data: Data = Data.Builder().putInt("Progress", progress).build()
                         setProgressAsync(data);
                     }
-//                    Log.d("lala", "progress=$progress")
+                    Log.d("lala", "progress=$progress")
 
                     outputStream.write(buffer, 0, length)
                 }
@@ -159,8 +149,6 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
                 // Refresh gallery
                 MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
-//            } catch (e: IOException) {
-//                e.printStackTrace()
             } finally {
                 outputStream?.close()
                 inputStream.close()

@@ -106,68 +106,24 @@ class DownloadManagerActivity : BaseBindingActivity<ActivityDownloadBinding>() {
     @SuppressLint("Range")
     private fun queryState(downID: Long) {
         // 关键：通过ID向下载管理查询下载情况，返回一个cursor
-        val c: Cursor = downloadManager.query(
-            Query()
-                .setFilterById(downID)
-        )
+        val c: Cursor = downloadManager.query(Query().setFilterById(downID))
         if (c == null) {
-            Toast.makeText(this, "Download not found!", Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(this, "Download not found!", Toast.LENGTH_LONG).show()
         } else { // 以下是从游标中进行信息提取
             if (!c.moveToFirst()) {
                 c.close()
                 return
             }
-            Log.d(
-                TAG, "Column_id : " + c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID))
-            )
-            Log.d(
-                TAG,
-                ("Column_bytes_downloaded so far : "
-                        + c.getLong(
-                    c
-                        .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
-                ))
-            )
-            Log.d(
-                TAG,
-                ("Column last modified timestamp : "
-                        + c.getLong(
-                    c
-                        .getColumnIndex(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP)
-                ))
-            )
-            Log.d(
-                TAG,
-                ("Column local uri : "
-                        + c.getString(
-                    c
-                        .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
-                ))
-            )
-            Log.d(
-                TAG,
-                ("Column statue : "
-                        + c.getInt(
-                    c
-                        .getColumnIndex(DownloadManager.COLUMN_STATUS)
-                ))
-            )
-            Log.d(
-                TAG,
-                ("Column reason : "
-                        + c.getInt(
-                    c
-                        .getColumnIndex(DownloadManager.COLUMN_REASON)
-                ))
-            )
-
+            Log.d(TAG, "Column_id : " + c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)))
+            Log.d(TAG, ("Column_bytes_downloaded so far : " + c.getLong(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))))
+            Log.d(TAG, ("Column last modified timestamp : " + c.getLong(c.getColumnIndex(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP))))
+            Log.d(TAG, ("Column local uri : " + c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))))
+            Log.d(TAG, ("Column statue : " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))))
+            Log.d(TAG, ("Column reason : " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON))))
             val st = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))
             Toast.makeText(this, statusMessage(st), Toast.LENGTH_LONG).show()
-
             //Log.i(TAG, statusMessage(st));
             c.close()
-
 
             if(st == 8  || st == 16){
                 Log.d("lala", "stopQuery")

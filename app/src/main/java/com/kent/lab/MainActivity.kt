@@ -15,7 +15,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
 
 
     private val mTitle = arrayOf(
-        "Download",
+        "DownloadManager",
         "WorkManager",
 //        "WebsocketActivity",
 //        "AudioActivity",
