@@ -7,8 +7,11 @@ import android.os.Environment
 import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.lifecycle.Observer
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -18,8 +21,8 @@ import okhttp3.Request
 import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStream
+
 
 class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
@@ -34,11 +37,40 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             Log.d("lala", "work request flag1")
             val videoUrl = "https://cdn.17app.co/go-prod/clip/2bcKp1KrusUrSiO14qdNAZPTwPK_20240129062031.mp4"
 
+            val workTag = "testTag"
             val downloadRequest = OneTimeWorkRequestBuilder<DownloadWorker>()
                 .setInputData(workDataOf("DOWNLOAD_URL" to videoUrl))
+                .addTag(workTag)
                 .build()
 
-            WorkManager.getInstance(this).enqueue(downloadRequest)
+            val workManager = WorkManager.getInstance(this)
+            workManager.enqueue(downloadRequest)
+//            workManager.getWorkInfosByTag(workTag).
+
+            workManager.getWorkInfoByIdLiveData(downloadRequest.id).observe(this, object : Observer<WorkInfo?> {
+                //获取WorkInfo对象，实时监测任务的状态
+                override fun onChanged(workInfo: WorkInfo?) {
+                    workInfo?.let {
+                        when (it.state) {
+                            WorkInfo.State.RUNNING -> {
+                                Log.e("调试_临时_log", "当前进度 = " + it.progress.getInt("Progress", -1));
+                            }
+                            WorkInfo.State.SUCCEEDED -> {
+                                Log.d("lala", "workInfo success value=$workInfo")
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+                //                fun onChanged(workInfo: WorkInfo?) {
+//                    if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+//                        val value = workInfo.outputData.getString("key") //获取Worker返回的数据
+//                    }
+//                }
+            })
+
+
+
             Log.d("lala", "work request flag2")
 
         }
@@ -93,7 +125,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             }
         }
 
-        private fun saveFileToGallery(context: Context, inputStream: InputStream, fileName: String, contentLength:Long) {
+        private fun saveFileToGallery(context: Context, inputStream: InputStream, fileName: String, contentLength: Long) {
             val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
             val appDir = File(picturesDir, "MyAppImages")
 
@@ -105,16 +137,21 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             var outputStream: FileOutputStream? = null
             var totalBytesRead: Long = 0
 
-
+            var mProgress = 0
 
             try {
                 outputStream = FileOutputStream(file)
-                val buffer = ByteArray(8192*10)
+                val buffer = ByteArray(8192*5 )
                 var length: Int
                 while (inputStream.read(buffer).also { length = it } != -1) {
                     totalBytesRead += length
                     val progress = (100 * totalBytesRead / contentLength).toInt()
-                    Log.d("lala", "progress=$progress")
+                    if(progress >mProgress ){
+                        mProgress = progress
+                        val data: Data = Data.Builder().putInt("Progress", progress).build()
+                        setProgressAsync(data);
+                    }
+//                    Log.d("lala", "progress=$progress")
 
                     outputStream.write(buffer, 0, length)
                 }
