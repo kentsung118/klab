@@ -1,19 +1,12 @@
 package com.kent.lab
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.kent.lab.databinding.ActivityMainBinding
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
 
@@ -23,7 +16,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
 
     private val mTitle = arrayOf(
         "Download",
-//        "Download Video",
+        "WorkManager",
 //        "WebsocketActivity",
 //        "AudioActivity",
 //        "Transition Drawable",
@@ -38,8 +31,8 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
 //        "CountdownTimerActivity"
     )
     private val mClasses = arrayOf<Class<*>>(
-        DownloadActivity::class.java,
-//        EditTextActivity::class.java,
+        DownloadManagerActivity::class.java,
+        WorkManagerActivity::class.java,
 //        WebsocketActivity::class.java,
 //        AudioActivity::class.java,
 //        TransitionDrawableActivity::class.java,
