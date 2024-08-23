@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -16,6 +17,7 @@ import android.view.LayoutInflater
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -41,6 +43,11 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding.btn4.setOnClickListener {
+            shareToIG()
+        }
+
         binding.btn2.setOnClickListener {
             val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
             ///storage/emulated/0/DCIM/75143711_kent.mp4
@@ -225,5 +232,42 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                 notify(notificationId, builder.build())
             }
         }
+    }
+
+    //https://developers.facebook.com/docs/instagram-platform/sharing-to-stories
+    fun shareToIG (){
+        Log.d("lala", "packageName=$packageName")
+
+        // 1. 准备要分享的媒体文件的 URI
+        val videoFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "9423593_kent.mp4")
+        Log.d("lala", "videoFile=$videoFile")
+        Log.d("lala", "videoFile.size=${videoFile.length()}")
+
+
+        val videoUri: Uri = FileProvider.getUriForFile(
+            this,
+            "$packageName.fileprovider", // 替换为你应用的 fileprovider 的 authority
+            videoFile
+        )
+
+        // 2. 创建并设置 Intent
+        val intent = Intent("com.instagram.share.ADD_TO_STORY").apply {
+            setDataAndType(videoUri, "video/mp4") // 设置数据类型为视频
+            putExtra("source_application", packageName) // 传递来源应用包名
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION // 授予 Instagram 读取 URI 的权限
+        }
+
+        grantUriPermission(
+            "com.instagram.android", videoUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        // 3. 检查 Instagram 是否已安装并启动 Intent
+//        if (intent.resolveActivity(packageManager) != null) {
+            Log.d("lala", "share to IG")
+            startActivity(intent)
+//        } else {
+//            Log.d("lala", "提示用户安装 Instagram或者提示错误信息")
+//            // 提示用户安装 Instagram
+//            // 或者提示错误信息
+//        }
     }
 }
