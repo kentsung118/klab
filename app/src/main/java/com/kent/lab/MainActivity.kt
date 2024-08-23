@@ -1,7 +1,9 @@
 package com.kent.lab
 
 import android.content.Intent
+import android.os.Build.BRAND
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
@@ -52,6 +54,8 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
 
         binding.list.setAdapter(ArrayAdapter(this, R.layout.item_list, R.id.tv_items, mTitle))
         initListener()
+
+        Log.d("lala", BRAND)
     }
 
     private fun initListener() {

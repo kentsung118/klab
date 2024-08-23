@@ -1,12 +1,21 @@
 package com.kent.lab
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -58,11 +67,29 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             val downloadRequest = OneTimeWorkRequestBuilder<DownloadWorker>()
                 .setInputData(workDataOf("DOWNLOAD_URL" to videoUrl))
                 .addTag(workTag)
+//                .setExpedited()
                 .build()
 
             val workManager = WorkManager.getInstance(this)
+
+
             workManager.enqueue(downloadRequest)
-//            workManager.getWorkInfosByTag(workTag).
+//            workManager.getWorkInfosByTagLiveData(workTag).observe(this, object :Observer<List<WorkInfo>>{
+//                override fun onChanged(value: List<WorkInfo>) {
+//                    Log.d("lala", "value size=${value.size}");
+//                    value[0].let {
+//                        when (it.state) {
+//                            WorkInfo.State.RUNNING -> {
+//                                Log.d("lala", "当前进度 = " + it.progress.getInt("Progress", -1));
+//                            }
+//                            WorkInfo.State.SUCCEEDED -> {
+//                                Log.d("lala", "workInfo success value=$it")
+//                            }
+//                            else -> {}
+//                        }
+//                    }
+//                }
+//            } )
 
             //從 Main thread 監聽 進度
             workManager.getWorkInfoByIdLiveData(downloadRequest.id).observe(this, object : Observer<WorkInfo?> {
@@ -90,29 +117,24 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
         CoroutineWorker(appContext, workerParams) {
 
         override suspend fun doWork(): Result {
-            Log.d("lala", "doWork flag1")
+            Log.d("lala", "doWork start")
             val url = inputData.getString("DOWNLOAD_URL") ?: return Result.failure()
-            Log.d("lala", "doWork flag2")
             try {
                 val client = OkHttpClient()
                 val request = Request.Builder().url(url).build()
                 val response = client.newCall(request).execute()
-                Log.d("lala", "doWork flag3")
                 if (!response.isSuccessful) return Result.failure()
-                Log.d("lala", "doWork flag4")
                 val fileName = "${SystemClock.uptimeMillis()}_kent.mp4"
                 Log.d("lala", "file name =$fileName")
                 // Save file to disk, update progress, etc.
                 // ...
                 val body: ResponseBody? = response.body
-                Log.d("lala", "doWork flag5")
                 body?.let { responseBody ->
-                    Log.d("lala", "doWork flag4")
                     val contentLength = responseBody.contentLength()
                     saveFileToGallery(appContext, responseBody.byteStream(), fileName, contentLength)
-                    Log.d("lala", "doWork flag5")
                 }
-                Log.d("lala", "doWork flag flag6")
+                Log.d("lala", "doWork success")
+                sendNotification(appContext)
                 return Result.success()
             } catch (e: Exception) {
                 Log.d("lala", "doWork flag exception, $e")
@@ -140,8 +162,8 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                         mProgress = progress
                         val data: Data = Data.Builder().putInt("Progress", progress).build()
                         setProgressAsync(data);
+                        Log.d("lala", "progress=$progress")
                     }
-                    Log.d("lala", "progress=$progress")
 
                     outputStream.write(buffer, 0, length)
                 }
@@ -152,6 +174,55 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
             } finally {
                 outputStream?.close()
                 inputStream.close()
+            }
+        }
+
+        fun sendNotification(context: Context) {
+            val channelId = "my_channel_id"
+            val channelName = "My Channel"
+            val notificationId = 1
+
+            // 创建通知频道（仅在 API 26+ 必须）
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(channelId, channelName, importance).apply {
+                    description = "Channel description"
+                }
+
+                // 注册频道到系统
+                val notificationManager: NotificationManager =
+                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            // 创建通知的 PendingIntent（点击通知时的动作）
+//            val intent = Intent(context, MyActivity::class.java).apply {
+//                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            }
+//            val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+
+            // 创建通知
+            val builder = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_launcher_background) // 必须的: 设置小图标
+                .setContentTitle("My notification")         // 标题
+                .setContentText("Hello World!")             // 内容
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setContentIntent(pendingIntent)            // 设置 PendingIntent
+                .setAutoCancel(true)                        // 点击后自动取消通知
+
+            // 发布通知
+            with(NotificationManagerCompat.from(context)) {
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return
+                }
+                notify(notificationId, builder.build())
             }
         }
     }
