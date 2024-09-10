@@ -33,6 +33,7 @@ import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.util.UUID
 
 
 class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
@@ -40,9 +41,18 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
     override val bindingInflater: (LayoutInflater) -> ActivityWorkBinding
         get() = ActivityWorkBinding::inflate
 
+    val workManager = WorkManager.getInstance(this)
+    var workId : UUID? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding.btn5.setOnClickListener {
+            workId?.let {
+                Log.d("lala", " workManager.cancelWorkById($it)")
+                workManager.cancelWorkById(it)
+            }
+        }
 
         binding.btn4.setOnClickListener {
             shareToIG()
@@ -68,7 +78,8 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
         binding.btn1.setOnClickListener {
             Log.d("lala", "work request flag1")
-            val videoUrl = "https://cdn.17app.co/go-prod/clip/2bcKp1KrusUrSiO14qdNAZPTwPK_20240129062031.mp4"
+//            val videoUrl = "https://cdn.17app.co/go-prod/clip/2bcKp1KrusUrSiO14qdNAZPTwPK_20240129062031.mp4"
+            val videoUrl = "https://cdn.17app.co/go-prod/clip/2lBQqE4v3MWFUMRCxXnED20W6fI_20240826054810.mp4"
 
             val workTag = "testTag"
             val downloadRequest = OneTimeWorkRequestBuilder<DownloadWorker>()
@@ -76,9 +87,10 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                 .addTag(workTag)
 //                .setExpedited()
                 .build()
+            workId = downloadRequest.id
+            Log.d("lala", "workId=$workId")
 
-            val workManager = WorkManager.getInstance(this)
-
+//            workManager.cancelWorkById()
 
             workManager.enqueue(downloadRequest)
 //            workManager.getWorkInfosByTagLiveData(workTag).observe(this, object :Observer<List<WorkInfo>>{
@@ -150,7 +162,12 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
         }
 
         private fun saveFileToGallery(context: Context, inputStream: InputStream, fileName: String, contentLength: Long) {
-            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            val picturesDir = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)}/media17"
+
+            val dir = File(picturesDir)
+            if(!dir.exists()){
+                dir.mkdir()
+            }
 
             val file = File(picturesDir, fileName)
             var outputStream: FileOutputStream? = null
@@ -163,6 +180,9 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                 val buffer = ByteArray(8192 )
                 var length: Int
                 while (inputStream.read(buffer).also { length = it } != -1) {
+                    if(isStopped){
+                        return
+                    }
                     totalBytesRead += length
                     val progress = (100 * totalBytesRead / contentLength).toInt()
                     if(progress >mProgress ){
