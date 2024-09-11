@@ -19,7 +19,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
     private val mTitle = arrayOf(
         "DownloadManager",
         "WorkManager",
-//        "WebsocketActivity",
+        "MaskView",
 //        "AudioActivity",
 //        "Transition Drawable",
 //        "Constraint Layout",
@@ -35,7 +35,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
     private val mClasses = arrayOf<Class<*>>(
         DownloadManagerActivity::class.java,
         WorkManagerActivity::class.java,
-//        WebsocketActivity::class.java,
+        MaskViewActivity::class.java,
 //        AudioActivity::class.java,
 //        TransitionDrawableActivity::class.java,
 //        ConstransLayoutDemoActivity::class.java,
