@@ -13,6 +13,21 @@
         android:text="開啟 mask view"/>
 
 
+    <Button android:id="@+id/btn2"
+        app:layout_constraintTop_toBottomOf="@+id/btn1"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="開啟 mask dialog"/>
+
+    <Button android:id="@+id/btn3"
+        app:layout_constraintTop_toBottomOf="@+id/btn2"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="開啟 mask dialog (LockScreen)"/>
+
+
     <TextView
         android:id="@+id/text"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,6 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="30sp"
         android:text="HelloHello"/>
 
     <com.kent.lab.view.DownloadMaskView
