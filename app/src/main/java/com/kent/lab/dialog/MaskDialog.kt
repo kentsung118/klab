@@ -1,11 +1,15 @@
 package com.kent.lab.dialog
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.kent.lab.BaseBindingDialogFragment
 import com.kent.lab.R
@@ -29,7 +33,10 @@ class MaskDialog(val lockScreen: Boolean = false) : BaseBindingDialogFragment<La
                 params.height = WindowManager.LayoutParams.MATCH_PARENT
                 attributes = params
             }
+            binding?.mask?.isVisible = true
             return
+        } else {
+          binding?.mask?.isVisible = false
         }
 
         // 获取对话框的 Window，并设置 Window 的属性
@@ -61,12 +68,18 @@ class MaskDialog(val lockScreen: Boolean = false) : BaseBindingDialogFragment<La
             setGravity(Gravity.BOTTOM)
 
         }
+
+
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (lockScreen) {
             binding?.mask?.visibility = View.VISIBLE
+        }
+        binding?.cancel?.setOnClickListener {
+            dismiss()
         }
     }
 }
