@@ -40,4 +40,19 @@
         android:textAllCaps="false"
         android:text="cancel download"/>
 
+    <Button
+        android:id="@+id/btn6"
+        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:textAllCaps="false"
+        android:text="update file time"/>
+
+    <Button
+        android:id="@+id/btn7"
+        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:textAllCaps="false"
+        android:text="insert file"/>
+
+
 </LinearLayout>

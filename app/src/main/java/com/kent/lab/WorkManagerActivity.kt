@@ -3,21 +3,26 @@ package com.kent.lab
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.media.ExifInterface
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.SystemClock
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import androidx.lifecycle.Observer
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -31,8 +36,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.UUID
 
 
@@ -46,6 +54,21 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding.btn7.setOnClickListener {
+            val path = "/storage/emulated/0/DCIM/media17/2jmVJ1mjWseJlTB20UV9RUGmTvb_20240726111056.mp4"
+            val file = File(path)
+            Log.d("lala", "file.name=${file.name}, size=${file.length()}")
+            insertMp4FileIntoMediaStore(this, file)
+
+//            MediaScannerConnection.scanFile(this, arrayOf(file.absolutePath), arrayOf("video/mp4")) { path, uri ->
+//                // 扫描完成后的回调
+//            }
+        }
+
+        binding.btn6.setOnClickListener {
+            updateFileTime()
+        }
 
         binding.btn5.setOnClickListener {
             workId?.let {
@@ -290,4 +313,203 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 //            // 或者提示错误信息
 //        }
     }
+
+    private fun updateFileTime(){
+//        val fileName="2kxdyGQLXElGcYc1XJLDY3Own8j_20240821083853.mp4"
+        val fileName="109596132_kent.mp4"
+
+        val videoFile = File("${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)}", fileName)
+
+        val videoUri: Uri = FileProvider.getUriForFile(
+            this,
+            "$packageName.fileprovider", // 替换为你应用的 fileprovider 的 authority
+            videoFile
+        )
+
+        val list = getMp4FilesFromDCIM(this)
+        list.forEach {
+            updateMediaStoreDateTaken(this, it)
+            Log.d("lala", " it.path = ${ it.path}")
+        }
+
+//        getMediaUriFromFilePath(Environment.DIRECTORY_DCIM)
+//        saveFileAndUpdateDateTaken(this, videoFile)
+
+//        val videoUri = getMediaUriFromFilePath(this,videoFile.path ) ?:return
+
+//        Log.d("lala", "videoUri = ${videoUri.path}")
+//        Log.d("lala", "file length = ${videoUri.toFile().length()}")
+//        updateMediaStoreDateTaken(this, videoUri)
+
+        // Refresh gallery
+//        MediaScannerConnection.scanFile(this, arrayOf(videoFile.absolutePath), arrayOf("video/mp4")) { path, uri ->
+//            // 扫描完成后的回调
+//        }
+    }
+
+    fun updateMediaStoreDateTaken(context: Context, fileUri: Uri) {
+        val contentResolver = context.contentResolver
+
+        // 创建包含日期的 ContentValues，DATE_TAKEN 使用当前时间
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis())
+        }
+
+        val collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+        val selection = "${MediaStore.Video.Media.RELATIVE_PATH} LIKE ? AND ${MediaStore.Video.Media.MIME_TYPE} = ?"
+        val selectionArgs = arrayOf("%DCIM%", "video/mp4")  // 过滤 DCIM 目录下的 .mp4 文件
+
+        // 更新媒体库中的文件元数据
+        try {
+            val rowsUpdated = contentResolver.update(fileUri, contentValues, selection, selectionArgs)
+            if (rowsUpdated > 0) {
+                Log.d("lala", "媒体文件的 DATE_TAKEN 已更新")
+            } else {
+                Log.e("lala", "未找到要更新的媒体文件")
+            }
+        } catch (e: Exception) {
+            Log.e("lala", "e=$e")
+            e.printStackTrace()
+        }
+    }
+
+    fun getMediaUriFromFilePath(context: Context, filePath: String): Uri? {
+        val projection = arrayOf(MediaStore.Video.Media._ID)
+        val selection = MediaStore.Video.Media.DATA + "=?"
+        val selectionArgs = arrayOf(filePath)
+
+        val cursor = context.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            null
+        )
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+                return Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
+            }
+        }
+
+        return null
+    }
+
+    // 将文件插入到 MediaStore 并获取文件的 Uri
+    fun insertFileIntoMediaStore(context: Context, file: File): Uri? {
+        val contentResolver = context.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")  // 根据文件类型设置 MIME 类型
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM )  // 指定存储路径
+            put(MediaStore.MediaColumns.DATE_TAKEN, System.currentTimeMillis())  // 设置拍摄时间
+            put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000)  // 设置添加时间（秒为单位）
+            put(MediaStore.MediaColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000)  // 设置修改时间
+        }
+
+        val uri: Uri? = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
+        return uri
+    }
+
+    fun saveFileAndUpdateDateTaken(context: Context, file: File) {
+        // 1. 将文件插入到 MediaStore 中
+        val fileUri = insertFileIntoMediaStore(context, file)
+        Log.e("lala", "fileUri=$fileUri")
+        // 2. 如果文件插入成功，更新 DATE_TAKEN 字段
+        fileUri?.let {
+            updateMediaStoreDateTaken(context, it)
+        }
+    }
+
+    fun getMp4FilesFromDCIM(context: Context): List<Uri> {
+        val mp4Uris = mutableListOf<Uri>()
+
+        // MediaStore URI for external video files
+        val collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+        // Projection (columns to retrieve)
+        val projection = arrayOf(
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.DISPLAY_NAME,  // 文件名称
+            MediaStore.Video.Media.RELATIVE_PATH  // 文件相对路径
+        )
+
+        // Selection (filtering condition)
+        val selection = "${MediaStore.Video.Media.RELATIVE_PATH} LIKE ? AND ${MediaStore.Video.Media.MIME_TYPE} = ?"
+        val selectionArgs = arrayOf("%DCIM%", "video/mp4")  // 过滤 DCIM 目录下的 .mp4 文件
+
+        // Sort order (optional)
+        val sortOrder = "${MediaStore.Video.Media.DATE_TAKEN} DESC"
+
+        val cursor: Cursor? = context.contentResolver.query(
+            collection,          // 查询的 URI
+            projection,          // 需要返回的列
+            selection,           // 查询条件
+            selectionArgs,       // 查询参数
+            sortOrder            // 排序条件
+        )
+
+        cursor?.use {
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
+            val nameColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
+
+            // 遍历 Cursor 提取文件的 Uri
+            while (it.moveToNext()) {
+                val id = it.getLong(idColumn)
+                val name = it.getString(nameColumn)
+                Log.e("lala", "name=$name")
+                val contentUri = Uri.withAppendedPath(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id.toString()
+                )
+
+//                if(name == "kent.mp4"){
+//                    updateMediaStoreDateTaken(this, contentUri)
+//                }
+                mp4Uris.add(contentUri)
+            }
+        }
+
+        return mp4Uris
+    }
+
+
+
+    fun insertMp4FileIntoMediaStore(context: Context, mp4File: File): Uri? {
+        // 设置要插入到 MediaStore 的文件信息
+        val values = ContentValues().apply {
+            put(MediaStore.Video.Media.DISPLAY_NAME, "new.mp4") // 文件名
+            put(MediaStore.Video.Media.MIME_TYPE, "video/mp4") // 文件类型
+            put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_DCIM ) // 存储目录
+//            put(MediaStore.Video.Media.DATE_ADDED, System.currentTimeMillis() / 1000) // 添加时间
+            put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis()) // 拍摄时间
+//            put(MediaStore.Video.Media.DATE_MODIFIED, System.currentTimeMillis() / 1000) // 修改时间
+        }
+
+        // 通过 ContentResolver 插入到 MediaStore
+        val resolver = context.contentResolver
+        val collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+        Log.d("lala", "insertMp4FileIntoMediaStore flag1")
+
+        // 插入文件并获取 URI
+        val uri: Uri? = resolver.insert(collection, values)
+        Log.d("lala", "insertMp4FileIntoMediaStore flag2")
+
+        // 如果 URI 不为空，开始写入文件内容
+        uri?.let {
+            Log.d("lala", "insertMp4FileIntoMediaStore flag3")
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                FileInputStream(mp4File).use { inputStream ->
+                    inputStream.copyTo(outputStream) // 将实际文件数据写入
+                }
+            }
+        }
+        Log.d("lala", "insertMp4FileIntoMediaStore flag4")
+
+        return uri
+    }
+
+
 }
