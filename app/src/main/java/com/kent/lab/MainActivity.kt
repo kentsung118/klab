@@ -20,6 +20,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
         "DownloadManager",
         "WorkManager",
         "MaskView",
+        "MediaStoreActivity"
 //        "AudioActivity",
 //        "Transition Drawable",
 //        "Constraint Layout",
@@ -36,6 +37,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
         DownloadManagerActivity::class.java,
         WorkManagerActivity::class.java,
         MaskViewActivity::class.java,
+        MediaStoreActivity::class.java
 //        AudioActivity::class.java,
 //        TransitionDrawableActivity::class.java,
 //        ConstransLayoutDemoActivity::class.java,

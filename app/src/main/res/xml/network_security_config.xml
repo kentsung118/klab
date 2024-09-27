@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--[Zack]allow all Network connection types HTTP and HTTPS in Android (9) -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+    </base-config>
+</network-security-config>

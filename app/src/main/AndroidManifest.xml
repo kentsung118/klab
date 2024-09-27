@@ -12,6 +12,7 @@
 <!--        tools:ignore="ReservedSystemPermission" />-->
 
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
         android:name=".application.KLabApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -37,6 +38,7 @@
         <activity android:name=".DownloadManagerActivity"/>
         <activity android:name=".WorkManagerActivity"/>
         <activity android:name=".MaskViewActivity"/>
+        <activity android:name=".MediaStoreActivity"/>
 
 
         <provider
