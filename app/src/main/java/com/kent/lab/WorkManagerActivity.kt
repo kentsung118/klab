@@ -52,6 +52,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
     val workManager = WorkManager.getInstance(this)
     var workId : UUID? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -101,8 +102,8 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
 
         binding.btn1.setOnClickListener {
             Log.d("lala", "work request flag1")
-//            val videoUrl = "https://cdn.17app.co/go-prod/clip/2bcKp1KrusUrSiO14qdNAZPTwPK_20240129062031.mp4"
-            val videoUrl = "https://cdn.17app.co/go-prod/clip/2lBQqE4v3MWFUMRCxXnED20W6fI_20240826054810.mp4"
+            val videoUrl = "http://cdn.17app.co/go-prod/clip/2bcKp1KrusUrSiO14qdNAZPTwPK_20240129062031.mp4"
+//            val videoUrl = "https://cdn.17app.co/go-prod/clip/2lBQqE4v3MWFUMRCxXnED20W6fI_20240826054810.mp4"
 
             val workTag = "testTag"
             val downloadRequest = OneTimeWorkRequestBuilder<DownloadWorker>()
@@ -158,13 +159,18 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
     class DownloadWorker(val appContext: Context, workerParams: WorkerParameters) :
         CoroutineWorker(appContext, workerParams) {
 
+        val okHttpClient = OkHttpClient.Builder()
+            .retryOnConnectionFailure(false)
+            .hostnameVerifier { _, _ -> true }
+            .build()
+
         override suspend fun doWork(): Result {
             Log.d("lala", "doWork start")
             val url = inputData.getString("DOWNLOAD_URL") ?: return Result.failure()
             try {
-                val client = OkHttpClient()
+
                 val request = Request.Builder().url(url).build()
-                val response = client.newCall(request).execute()
+                val response = okHttpClient.newCall(request).execute()
                 if (!response.isSuccessful) return Result.failure()
                 val fileName = "${SystemClock.uptimeMillis()}_kent.mp4"
                 Log.d("lala", "file name =$fileName")
@@ -180,7 +186,7 @@ class WorkManagerActivity : BaseBindingActivity<ActivityWorkBinding>() {
                 return Result.success()
             } catch (e: Exception) {
                 Log.d("lala", "doWork flag exception, $e")
-                return Result.retry()
+                return Result.failure()
             }
         }
 
