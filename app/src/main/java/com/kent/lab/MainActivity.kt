@@ -9,8 +9,9 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.kent.lab.databinding.ActivityMainBinding
+import com.kent.lab.touchevent.TouchEventActivity
 
-class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
+class MainActivity : BaseBindingActivity<ActivityMainBinding>() {
 
     override val bindingInflater: (LayoutInflater) -> ActivityMainBinding
         get() = ActivityMainBinding::inflate
@@ -20,8 +21,8 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
         "DownloadManager",
         "WorkManager",
         "MaskView",
-        "MediaStoreActivity"
-//        "AudioActivity",
+        "MediaStoreActivity",
+        "TouchEventActivity",
 //        "Transition Drawable",
 //        "Constraint Layout",
 //        "DesktopManager",
@@ -37,8 +38,8 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>(){
         DownloadManagerActivity::class.java,
         WorkManagerActivity::class.java,
         MaskViewActivity::class.java,
-        MediaStoreActivity::class.java
-//        AudioActivity::class.java,
+        MediaStoreActivity::class.java,
+        TouchEventActivity::class.java,
 //        TransitionDrawableActivity::class.java,
 //        ConstransLayoutDemoActivity::class.java,
 //        DesktopManagerActivity::class.java,

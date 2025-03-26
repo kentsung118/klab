@@ -39,6 +39,7 @@
         <activity android:name=".WorkManagerActivity"/>
         <activity android:name=".MaskViewActivity"/>
         <activity android:name=".MediaStoreActivity"/>
+        <activity android:name=".touchevent.TouchEventActivity"/>
 
 
         <provider
