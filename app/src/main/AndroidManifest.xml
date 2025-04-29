@@ -40,6 +40,7 @@
         <activity android:name=".MaskViewActivity"/>
         <activity android:name=".MediaStoreActivity"/>
         <activity android:name=".touchevent.TouchEventActivity"/>
+        <activity android:name=".tablayout.TabLayoutActivity"/>
 
 
         <provider

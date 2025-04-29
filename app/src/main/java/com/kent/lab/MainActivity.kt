@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.kent.lab.databinding.ActivityMainBinding
+import com.kent.lab.tablayout.TabLayoutActivity
 import com.kent.lab.touchevent.TouchEventActivity
 
 class MainActivity : BaseBindingActivity<ActivityMainBinding>() {
@@ -23,7 +24,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>() {
         "MaskView",
         "MediaStoreActivity",
         "TouchEventActivity",
-//        "Transition Drawable",
+        "TabLayout Activity",
 //        "Constraint Layout",
 //        "DesktopManager",
 //        "WorkManager",
@@ -40,7 +41,7 @@ class MainActivity : BaseBindingActivity<ActivityMainBinding>() {
         MaskViewActivity::class.java,
         MediaStoreActivity::class.java,
         TouchEventActivity::class.java,
-//        TransitionDrawableActivity::class.java,
+        TabLayoutActivity::class.java,
 //        ConstransLayoutDemoActivity::class.java,
 //        DesktopManagerActivity::class.java,
 //        WorkActivity::class.java,
