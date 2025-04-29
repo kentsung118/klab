@@ -13,4 +13,21 @@
         android:text="downloadmanage start"/>
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/black"
+            style="?android:attr/progressBarStyle" />
+
+    </LinearLayout>
+
+
 </LinearLayout>

@@ -1,28 +1,17 @@
-package com.kent.lab.touchevent;
+package com.kent.lab.touchevent
 
-import android.view.MotionEvent;
+import android.view.MotionEvent
 
-public class StringUtils {
-
-    public static String getMotionEventName(MotionEvent ev){
-        String result;
-        switch (ev.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                result = "ACTION_DOWN";
-                break;
-            case MotionEvent.ACTION_MOVE:
-                result = "ACTION_MOVE";
-                break;
-            case MotionEvent.ACTION_UP:
-                result = "ACTION_UP";
-                break;
-            case MotionEvent.ACTION_MASK:
-                result = "ACTION_MASK";
-                break;
-            default:
-                result = ""+ev.getAction();
+object StringUtils {
+    @JvmStatic
+    fun getMotionEventName(ev: MotionEvent): String {
+        val result = when (ev.action) {
+            MotionEvent.ACTION_DOWN -> "ACTION_DOWN"
+            MotionEvent.ACTION_MOVE -> "ACTION_MOVE"
+            MotionEvent.ACTION_UP -> "ACTION_UP"
+            MotionEvent.ACTION_MASK -> "ACTION_MASK"
+            else -> "" + ev.action
         }
-        return result;
+        return result
     }
-
 }

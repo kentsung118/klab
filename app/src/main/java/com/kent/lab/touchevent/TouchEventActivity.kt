@@ -19,6 +19,7 @@ class TouchEventActivity: BaseBindingActivity<ActivityTouchEventBinding>() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        ev?: return super.dispatchTouchEvent(ev)
         Log.i(TAG, "dispatchTouchEvent    action:" + StringUtils.getMotionEventName(ev))
         val superReturn = super.dispatchTouchEvent(ev)
         Log.d(TAG, "dispatchTouchEvent    action:" + StringUtils.getMotionEventName(ev) + " " + superReturn)
@@ -26,6 +27,7 @@ class TouchEventActivity: BaseBindingActivity<ActivityTouchEventBinding>() {
     }
 
     override fun onTouchEvent(ev: MotionEvent?): Boolean {
+        ev?: return super.dispatchTouchEvent(ev)
         Log.i(TAG, "onTouchEvent          action:" + StringUtils.getMotionEventName(ev))
         val superReturn = super.onTouchEvent(ev)
         Log.d(TAG, "onTouchEvent          action:" + StringUtils.getMotionEventName(ev) + " " + superReturn)
