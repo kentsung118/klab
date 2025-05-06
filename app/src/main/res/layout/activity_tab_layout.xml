@@ -10,13 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:tabIndicatorColor="@color/colorPrimary"
-        app:tabMaxWidth="200dp"
-        app:tabMinWidth="100dp"
+        app:tabIndicator="@drawable/tab_indicator_shape"
+        app:tabMinWidth="50dp"
         app:tabMode="scrollable"
         app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="5dp"
         app:tabSelectedTextColor="@color/colorPrimary"
-        app:tabTextColor="@color/black" />
+        app:tabTextColor="@color/black"
+
+        app:tabRippleColor="@null"
+        />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
