@@ -69,13 +69,6 @@ class TabLayoutActivity : BaseBindingActivity<ActivityTabLayoutBinding>() {
 
     class SimpleFragmentPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
-        private val tabTitles by lazy {
-            val list = ArrayList<String>()
-            for (index in 1..10) {
-                list.add("tab$index")
-            }
-            list
-        }
         private val fragment by lazy {
             val list = ArrayList<Fragment>()
             for (index in 1..10) {
