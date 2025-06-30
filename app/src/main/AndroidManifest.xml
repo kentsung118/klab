@@ -41,6 +41,7 @@
         <activity android:name=".MediaStoreActivity"/>
         <activity android:name=".touchevent.TouchEventActivity"/>
         <activity android:name=".tablayout.TabLayoutActivity"/>
+        <activity android:name=".GlideActivity"/>
 
 
         <provider

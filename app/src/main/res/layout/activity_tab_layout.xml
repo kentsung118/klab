@@ -21,7 +21,6 @@
         app:tabPaddingTop="9dp"
         app:tabRippleColor="@null"
         app:tabSelectedTextColor="@color/colorPrimary"
-
         app:tabTextColor="@color/black" />
 
     <androidx.viewpager2.widget.ViewPager2
