@@ -34,7 +34,6 @@ class MaskViewActivity : BaseBindingActivity<ActivityMaskViewBinding>() {
             Log.d("lala", "text click")
         }
 
-
     }
 
 }
