@@ -42,6 +42,8 @@
         <activity android:name=".touchevent.TouchEventActivity"/>
         <activity android:name=".tablayout.TabLayoutActivity"/>
         <activity android:name=".GlideActivity"/>
+        <activity android:name=".NullSafeActivity"/>
+
 
 
         <provider
