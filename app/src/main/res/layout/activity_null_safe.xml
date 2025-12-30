@@ -21,8 +21,19 @@
         android:text="測試 kotlin serialization"/>
 
 
+    <Button android:id="@+id/btn3"
+        app:layout_constraintTop_toBottomOf="@+id/btn2"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="測試 Gson 轉換 Gifts"/>
 
-
+    <Button android:id="@+id/btn4"
+        app:layout_constraintTop_toBottomOf="@+id/btn3"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="測試 kotlin 轉換 Gifts"/>
 
 
 
