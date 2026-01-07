@@ -1,0 +1,52 @@
+{
+  "user": {
+    "id": 123456789,
+    "username": "kent.sung",
+    "email": "kent.sung@example.com",
+    "is_active": true,
+    "registration_timestamp": 1678886400000
+  },
+  "details": {
+    "real_name": "Kent Sung",
+    "bio": "Android Developer | Tech Enthusiast",
+    "follower_count": 2048,
+    "following_count": 150
+  },
+  "recent_posts": [
+    {
+      "post_id": "post_001",
+      "title": "Exploring Kotlin Serialization",
+      "like_count": 120,
+      "comments": [
+        "Great article!",
+        "Very informative, thanks!"
+      ]
+    },
+    {
+      "post_id": "post_002",
+      "title": "Performance Matters",
+      "like_count": 256,
+      "comments": [
+        "I agree!",
+        "How does it compare to Moshi?",
+        "Awesome content."
+      ]
+    }
+  ],
+  "friends": [
+    {
+      "id": 987654321,
+      "username": "friend.one",
+      "email": "friend.one@example.com",
+      "is_active": true,
+      "registration_timestamp": 1678880000000
+    },
+    {
+      "id": 555444333,
+      "username": "friend.two",
+      "email": "friend.two@example.com",
+      "is_active": false,
+      "registration_timestamp": 1678870000000
+    }
+  ]
+}

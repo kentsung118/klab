@@ -1,0 +1,76 @@
+[
+  {
+    "feed_id": "feed_101",
+    "author": {
+      "user_id": "user_alpha",
+      "display_name": "Alpha User",
+      "avatar_url": "https://example.com/avatars/alpha.png"
+    },
+    "content": "Just finished a great workout session! #fitness #motivation",
+    "timestamp": 1678900000000,
+    "reactions": [
+      { "type": "like", "count": 152 },
+      { "type": "love", "count": 34 }
+    ],
+    "comments": [
+      {
+        "comment_id": "comment_101_1",
+        "author": {
+          "user_id": "user_beta",
+          "display_name": "Beta User",
+          "avatar_url": "https://example.com/avatars/beta.png"
+        },
+        "content": "Way to go!",
+        "timestamp": 1678900100000
+      },
+      {
+        "comment_id": "comment_101_2",
+        "author": {
+          "user_id": "user_gamma",
+          "display_name": "Gamma User",
+          "avatar_url": "https://example.com/avatars/gamma.png"
+        },
+        "content": "Keep it up!",
+        "timestamp": 1678900200000
+      }
+    ],
+    "media": [
+      {
+        "media_type": "image",
+        "url": "https://example.com/images/workout1.jpg",
+        "width": 1080,
+        "height": 1080
+      }
+    ]
+  },
+  {
+    "feed_id": "feed_102",
+    "author": {
+      "user_id": "user_beta",
+      "display_name": "Beta User",
+      "avatar_url": "https://example.com/avatars/beta.png"
+    },
+    "content": "Check out this amazing sunset I captured.",
+    "timestamp": 1678910000000,
+    "reactions": [
+      { "type": "like", "count": 543 },
+      { "type": "love", "count": 210 },
+      { "type": "wow", "count": 88 }
+    ],
+    "comments": [],
+    "media": [
+      {
+        "media_type": "image",
+        "url": "https://example.com/images/sunset1.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "media_type": "image",
+        "url": "https://example.com/images/sunset2.jpg",
+        "width": 1920,
+        "height": 1080
+      }
+    ]
+  }
+]
